@@ -1,13 +1,24 @@
-package com.in28minutes.microservices.currencyexchangeservice;
+package com.in28minutes.microservices.currencyexchangeservice.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 
+@Entity
 public class ExchangeValue {
+    @Id
     private Long id;
+
+    @Column(name = "currency_from")
     private String from;
+
+    @Column(name = "currency_to")
     private String to;
 
     private BigDecimal conversionMultiple;
+
+    @javax.persistence.Transient
     private int port;
 
     public Long getId() {

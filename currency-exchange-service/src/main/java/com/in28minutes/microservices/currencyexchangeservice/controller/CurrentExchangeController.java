@@ -1,5 +1,7 @@
-package com.in28minutes.microservices.currencyexchangeservice;
+package com.in28minutes.microservices.currencyexchangeservice.controller;
 
+import com.in28minutes.microservices.currencyexchangeservice.model.ExchangeValue;
+import com.in28minutes.microservices.currencyexchangeservice.repository.ExchangeValueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,20 +9,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 
-import javax.websocket.server.PathParam;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @RestController
 public class CurrentExchangeController {
 
     @Autowired
-    Environment environment;
+    private Environment environment;
+
+    @Autowired
+    private ExchangeValueRepository exchangeValueRepository;
 
     @GetMapping("/currency-exchange/from/{from}/to/{to}")
     public ExchangeValue retrieveExchangeValue(@PathVariable("from") String from, @PathVariable("to") String to){
 
-        ExchangeValue exchangeValue = new ExchangeValue(1000L,"usd","inr", BigDecimal.valueOf(65));
+        ExchangeValue exchangeValue=exchangeValueRepository.findByFromAndTo(from,to);
         exchangeValue.setPort(Integer.parseInt(environment.getProperty("local.server.port")));
+
         return exchangeValue;
     }
 }
