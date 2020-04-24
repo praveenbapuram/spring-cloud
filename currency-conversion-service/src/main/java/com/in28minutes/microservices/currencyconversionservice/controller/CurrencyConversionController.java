@@ -2,6 +2,8 @@ package com.in28minutes.microservices.currencyconversionservice.controller;
 
         import com.in28minutes.microservices.currencyconversionservice.proxy.CurrencyExchangeServiceProxy;
         import com.in28minutes.microservices.currencyconversionservice.bean.CurrencyConversionBean;
+        import org.slf4j.Logger;
+        import org.slf4j.LoggerFactory;
         import org.springframework.beans.factory.annotation.Autowired;
         import org.springframework.http.ResponseEntity;
         import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,8 @@ package com.in28minutes.microservices.currencyconversionservice.controller;
 
 @RestController
 public class CurrencyConversionController {
+
+    private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private CurrencyExchangeServiceProxy exchangeServiceProxy;
@@ -30,14 +34,17 @@ public class CurrencyConversionController {
         ResponseEntity<CurrencyConversionBean> responseEntity= new RestTemplate().getForEntity("http://localhost:8000/currency-exchange/from/{from}/to/{to}",CurrencyConversionBean.class,uriVariables);
         CurrencyConversionBean response=responseEntity.getBody();
 
+        logger.info("{}",response);
+
         return new CurrencyConversionBean(1L,from,to,quantity,response.getConversionMultiple(),quantity.multiply(response.getConversionMultiple()) ,response.getPort());
     }
 
 
     @GetMapping("/currency-converter-feign/from/{from}/to/{to}/quantity/{quantity}")
     public CurrencyConversionBean convertCurrencyFeign(@PathVariable String from,@PathVariable String to,@PathVariable BigDecimal quantity){
-           CurrencyConversionBean currencyConversionBean= exchangeServiceProxy.retrieveExchangeValue(from,to);
+        CurrencyConversionBean currencyConversionBean= exchangeServiceProxy.retrieveExchangeValue(from,to);
 
+        logger.info("{}",currencyConversionBean);
         return new CurrencyConversionBean(1L,from,to,quantity,currencyConversionBean.getConversionMultiple(),quantity.multiply(currencyConversionBean.getConversionMultiple()) ,currencyConversionBean.getPort());
     }
 }
